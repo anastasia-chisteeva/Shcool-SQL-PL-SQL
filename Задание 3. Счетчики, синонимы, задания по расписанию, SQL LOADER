@@ -1,0 +1,46 @@
+---- CЧЕТЧКИ
+---Создание seq_1 для заполнения id
+CREATE SEQUENCE seq_1
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 125
+NOCYCLE
+CACHE 20;
+---Использование seq_1
+UPDATE Students SET Student_id = seq_1.nextval;
+
+---Создание seq_2 для генирации номеров зачетной книжки
+CREATE SEQUENCE seq_1
+START WITH 1700000
+INCREMENT BY 5
+MINVALUE 1700000
+MAXVALUE 1700625
+CACHE 125
+ORDER;
+---Использование seq_2
+ALTER TABLE Students
+ADD Record_book NUMBER(7);
+UPDATE Students SET Recjrd_book=seq_2.nextval;
+
+---Создание seq_3 
+CREATE SEQUENCE seq_3
+START WITH 25
+INCREMENT BY -1
+MINVALUE 1
+MAXVALUE 25
+CYCLE
+CACHE 5
+ORDER;
+---Использование seq_3
+SELECT Surname, name, seq_3.nextval
+FROM Students
+WHERE gr_id=1;
+
+
+----СИНОНИМЫ
+CREATE PUBLIC SYNONYM tab_students FOR sys.Students;
+
+CREATE SYNONYM tab_advisers FOR sys.Scientific_advicers;
+GRANT select, insert, update ON tab_adviser TO A327;
+---Запрос под пользователем А327
+SELECT * FROM sys.Scientific_advicers;
