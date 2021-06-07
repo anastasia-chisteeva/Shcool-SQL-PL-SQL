@@ -44,3 +44,17 @@ CREATE SYNONYM tab_advisers FOR sys.Scientific_advicers;
 GRANT select, insert, update ON tab_adviser TO A327;
 ---Запрос под пользователем А327
 SELECT * FROM sys.Scientific_advicers;
+
+
+----ЗАГРУЗДА ДАННЫХ С ПОМОЩЬЮ SQL LOADER
+---Содержание управляющего файла
+OPTIONS (SKIP=1)
+LOAD DATA
+CHARACTERSET UTF8
+INFILE 'example.csv'
+BADFILE 'example.bad'
+DISCARDFILE 'example.dsc'
+INSERT
+INTO TABLE SYS.MY_EXAMPLE
+FIELDS TERMINATED BY ';'
+OPTIONALLY ENCLOSED BY '"'
