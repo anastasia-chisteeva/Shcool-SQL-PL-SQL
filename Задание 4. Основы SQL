@@ -1,0 +1,46 @@
+INSERT ALL
+INTO groups VALUES (4, 'Измайлов Петр Сергеевич')
+INTO scientific_advisers VALUES (4, 'Мишин Дмитрий Станиславович', 'Экономическая теория')
+INTO scientific_advisers VALUES (5, 'Игнатова Маргарита Михайловна', 'Финансы и кредит')
+INTO students VALUES (11, 'Гвоздецкая', 'Алиса', '2', '3', '4', '3', '1700050')
+INTO students VALUES (12, 'Алешин', 'Артем', '2', '1', '4', '4', '1700055')
+INTO students VALUES (13, 'Бондарева', 'Юлия', '2', '2', '4', '5', '1700060')
+INTO students VALUES (14, 'Васильева', 'Дарья', '1', '4', '1', '1', '1700065')
+INTO students VALUES (15, 'Григорян', 'Вадим', '1', '2', '1', '4', '1700070')
+INTO students VALUES (16, 'Зубков', 'Сергей', '2', '3', '2', '5', '1700075')
+INTO students VALUES (17, 'Каякова', 'Ксения', '1', '1', '3', '2', '1700080')
+INTO students VALUES (18, 'Лехтерев', 'Андрей', '1', '3', '4', '3', '1700085')
+INTO students VALUES (19, 'Молькова', 'Анастасия', '2', '4', '4', '1', '1700090')
+SELECT * FROM dual;
+
+DELETE FROM students
+WHERE study_id=1;
+
+SELECT surname, name
+FROM students
+WHERE study_id4 AND record_book>1700060;
+
+SELECT study_id, COUNT(study_id) AS CountStudOnCourse
+FROM students
+GROUP BY study_id
+ORDER BY study_id DESC;
+
+SELECT students.student_id, students.surname||' '||students.name AS name_student, 
+       scientific_advisers.name AS teacher, scientific_advisers.department
+FROM students
+    JOIN scientific_advisers
+        ON students.advicer_id=scientific_advisers.advicer_id
+ORDER BY name_student;
+
+SELECT students.surname, students.name, year_study.start_studies, specialty.specialty
+FROM students
+    JOIN (
+        SELECT students.surname, students.name, specialty.specialty
+        FROM students
+            JOIN specialty
+                ON students.spec_id=specialty.spec_id
+        )
+        ON students.study_id=year_study.study_id
+GROUP BY specialty;
+ 
+    
