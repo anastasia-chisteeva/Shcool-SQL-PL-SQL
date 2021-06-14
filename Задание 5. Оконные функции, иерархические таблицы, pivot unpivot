@@ -1,1 +1,135 @@
+--ОКОННЫЕ ФУНКЦИИ
 
+
+
+---ИЕРАРХИЧЕСКИЕ ТАБЛИЦЫ
+CREATE TABLE hierarchical_table (
+  id NUMBER,
+  pid NUMBER,
+  title VARCHAR2(300)
+);
+
+insert into hierarchical_table values (1, null, 'ЮФУ');
+insert into hierarchical_table values (2, 1, 'Академии');
+insert into hierarchical_table values (3, 1, 'Институты');
+insert into hierarchical_table values (4, 1, 'Факультеты');
+insert into hierarchical_table values (5, 1, 'Филиалы');
+insert into hierarchical_table values (6, 1, 'Представительства');
+insert into hierarchical_table values (7, 1, 'Лицей');
+insert into hierarchical_table values (8, 1, 'Колледж');
+insert into hierarchical_table values (9, 2, 'Академия археитектуры и искусств');
+insert into hierarchical_table values (10, 2, 'Академия психологии и педагогики');
+insert into hierarchical_table values (11, 2, 'Академия биологии и биотехнологии');
+insert into hierarchical_table values (12, 3, 'Институт наук о Земле');
+insert into hierarchical_table values (13, 3, 'Институт математики, механики и компьютерных наук');
+insert into hierarchical_table values (14, 3, 'Институт истории и международных отношений');
+insert into hierarchical_table values (15, 4, 'Факультет управления');
+insert into hierarchical_table values (16, 4, 'Экономический факультет');
+insert into hierarchical_table values (17, 4, 'Юридический факультет');
+insert into hierarchical_table values (18, 5, 'с.Учкекен');
+insert into hierarchical_table values (19, 5, 'г.Махачкала');
+insert into hierarchical_table values (20, 5, 'г.Новошахтинск');
+insert into hierarchical_table values (21, 5, 'г.Железноводск');
+insert into hierarchical_table values (22, 5, 'г.Геленджик');
+insert into hierarchical_table values (23, 6, 'г.Сочи');
+insert into hierarchical_table values (24, 6, 'г.Майкоп');
+insert into hierarchical_table values (25, 9, 'Кафедра градостроительства');
+insert into hierarchical_table values (26, 9, 'Кафедра архитектурного и средового проектирования');
+insert into hierarchical_table values (27, 26, 'Учебно-творческая мастерская ДАС');
+insert into hierarchical_table values (28, 9, 'Кафедра дизайнв');
+insert into hierarchical_table values (29, 28, 'Мастерская дизайна изделий промышленности');
+insert into hierarchical_table values (30, 28, 'Учебная швейная мастерская');
+insert into hierarchical_table values (31, 10, 'Кафедра дошкольного образования');
+insert into hierarchical_table values (32, 10, 'Кафедра начального образования');
+insert into hierarchical_table values (33, 10, 'Кафедра социальной психологии');
+insert into hierarchical_table values (34, 11, 'Кафедра биохимии и микробиологии');
+insert into hierarchical_table values (35, 11, 'Кафедра ботаники');
+insert into hierarchical_table values (36, 11, 'Кафедра генетики');
+insert into hierarchical_table values (37, 11, 'Кафедра зоологии');
+insert into hierarchical_table values (38, 12, 'Кафедра геоэкологии и прикладной геохимии');
+insert into hierarchical_table values (39, 38, 'Гидрохимический институт');
+insert into hierarchical_table values (40, 38, 'Научно-учебная лаборатория');
+insert into hierarchical_table values (41, 12, 'Кафедра месторождений полезных ископаемых');
+insert into hierarchical_table values (42, 41, 'Лаборатория геммологии Камея');
+insert into hierarchical_table values (43, 12, 'Кафедра общей и инженерной геологии');
+insert into hierarchical_table values (44, 13, 'Кафедра алгебры и дискретной математики');
+insert into hierarchical_table values (45, 13, 'Кафедра математического моделирования');
+insert into hierarchical_table values (46, 13, 'Кафедра теории упругости');
+insert into hierarchical_table values (47, 46, 'Лаборатории механики твердого тела');
+insert into hierarchical_table values (48, 14, 'Кафедра всеобщей истории');
+insert into hierarchical_table values (49, 14, 'Кафедра истории России');
+insert into hierarchical_table values (50, 14, 'Кафедра зарубежной истории и международных отношений');
+insert into hierarchical_table values (51, 15, 'Кафедра инновационного и международного менеджмента');
+insert into hierarchical_table values (52, 15, 'Кафедра маркетинга и коммуникаций в бизнесе');
+insert into hierarchical_table values (53, 15, 'Кафедра теории и технологии в бизнесе');
+insert into hierarchical_table values (54, 16, 'Кафедра экономической кибернетики');
+insert into hierarchical_table values (55, 16, 'Кафедра полиэкономии и политической экономики');
+insert into hierarchical_table values (56, 16, 'Кафедра управления человеческими ресурсами');
+insert into hierarchical_table values (57, 16, 'Кафедра финансы и кредит');
+insert into hierarchical_table values (58, 17, 'Кафедра гражданского права');
+insert into hierarchical_table values (59, 17, 'Кафедра международного права');
+insert into hierarchical_table values (60, 17, 'Кафедра уголовного права и криминологии');
+insert into hierarchical_table values (61, 17, 'Кафедра финансововго права');
+
+---Корневая запись
+SELECT id, pid, title
+FROM (
+    SELECT id, pid, title, level,
+        CONNECT_BY_ISLEAF as ISLEAF,
+        PRIOR title as PARENT_NAME,
+        CONNECT_BY_ROOT title as ROOT_NAME
+    FROM hierarchical_table
+    START WITH pid is null
+    CONNECT BY PRIOR id=pid)
+WHERE title=root_name;	
+
+---Листовые записи
+SELECT id, pid, title
+FROM (
+    SELECT id, pid, title, level,
+        CONNECT_BY_ISLEAF as ISLEAF
+    FROM hierarchical_table
+    START WITH pid is null
+    CONNECT BY PRIOR id=pid)
+WHERE ISLEAF=1
+ORDER BY pid;
+
+---Дерево
+SELECT lpad(' ',5*level)||title as TREE
+FROM hierarchical_table
+START WITH pid is null
+CONNECT BY PRIOR id = pid
+ORDER SIBLINGS BY title DESC;
+
+---
+SELECT SYS_CONNECT_BY_PATH(title, '/') as Path
+FROM hierarchical_table
+WHERE id=32
+START WITH pid is null
+CONNECT BY pid = PRIOR id
+ORDER BY pid;
+
+
+
+---PIVOT/UNPIVOT
+CREATE TABLE population_regions (
+    year       NUMBER(4),
+    region     VARCHAR2(100),
+    population NUMBER);
+
+INSERT INTO population_regions VALUES ('2017', 'Ростовская область', '4225903');
+INSERT INTO population_regions VALUES ('2018', 'Ростовская область', '4211386');
+INSERT INTO population_regions VALUES ('2017', 'Краснодарский край', '5587182');
+INSERT INTO population_regions VALUES ('2018', 'Краснодарский край', '5625827');
+INSERT INTO population_regions VALUES ('2017', 'Астраханская область', '1018190');
+INSERT INTO population_regions VALUES ('2018', 'Астраханская область', '1015790');
+INSERT INTO population_regions VALUES ('2017', 'Волгоградская область', '2528239');
+INSERT INTO population_regions VALUES ('2018', 'Волгоградская область', '2528239');
+
+CREATE TABLE pvt_pop_region AS
+SELECT * FROM population_regions 
+PIVOT (SUM(population) AS spop  FOR region IN ('Астраханская область', 'Волгоградская область', 'Краснодарский край', 'Ростовская область'))
+ORDER BY year; 
+
+SELECT * FROM pvt_pop_region
+UNPIVOT EXCLUDE NULLS (spop FOR region IN ('Астраханская область', 'Волгоградская область', 'Краснодарский край', 'Ростовская область'));
