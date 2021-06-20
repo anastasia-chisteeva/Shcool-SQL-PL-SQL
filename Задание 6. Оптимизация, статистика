@@ -1,1 +1,43 @@
+---СТАТИСКА ПО СХЕМЕ
+EXEC DBMS_STATS.GATHER_SCHEMA_STATS('A327');
+---СТАТИСТИКА ПО ТАБЛИЦЕ
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname => 'SYS',
+    tabname => 'students',
+    degree => 3,
+    estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
 
+
+----
+EXPLAIN PLAN FOR
+    SELECT student_id, surname, name, spec_id
+    FROM students
+    WHERE advicer_id = 2;
+    
+EXPLAIN PLAN FOR
+    SELECT students.student_id, students.surname||' '||students.name AS name_student, 
+       scientific_advisers.name AS teacher, scientific_advisers.department
+    FROM students
+        JOIN scientific_advisers
+        ON students.advicer_id=scientific_advisers.advicer_id
+    ORDER BY name_student;
+    
+EXPLAIN PLAN FOR
+    SELECT students.surname, students.name, year_study.start_studies, specialty.specialty
+    FROM students
+        JOIN (
+            SELECT students.surname, students.name, specialty.specialty
+            FROM students
+                JOIN specialty
+                ON students.spec_id=specialty.spec_id
+            )
+        ON students.study_id=year_study.study_id
+    GROUP BY specialty;
+    
+EXPLAIN PLAN FOR  
+    SELECT surname, name
+    FROM students
+    WHERE study_id=4 AND record_book>1700060;
