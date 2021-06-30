@@ -1,0 +1,92 @@
+--1
+select employee_id, upper(first_name)||' '||upper(last_name) as Имя_Фамилия,
+    translate(phone_number, '.', '-') as Номер_телефона
+from hr.employees
+
+select employee_id, lower(email)||'@mail.ru' as n_email
+from hr.employees
+where length(email)<=5
+
+select employee_id, start_date, end_date, job_id, department_id, round(months_between(end_date, start_date), 1) as срок_работы
+from hr.job_history
+
+select employee_id, first_name, last_name, job_id, substr(job_id, 1, 2) as job_code
+from hr.employees 
+
+
+--2
+select first_name, last_name, department_id, nvl(manager_id, 100) as manager_id, salary, nvl(commission_pct, 0) as commission_pct
+from hr.employees 
+
+
+--3
+CREATE TABLE goods(
+    good_is NUMBER(2),
+    group_goods VARCHAR2(100),
+    title_good VARCHAR2(50),
+    price NUMBER(5)
+)
+PARTITION BY LIST (group_goods)
+(
+PARTITION молочная_продукция VALUES ('Молоко', 'Кефир', 'Ряженка'),
+PARTITION бакалея VALUES ('Оливковое масло', 'Макароны', 'Овсяные хлопья'),
+PARTITION кондитерские_изделия VALUES ('Шоколад', 'Конфеты', 'Мармелад'),
+PARTITION замороженная_продукция VALUES ('Блины', 'Котлеты', 'Пельмени'),
+PARTITION напитки VALUES ('Газированная вода', 'Негазированная вода', 'Сок')
+)
+
+INSERT INTO goods VALUES (1, 'молочная_продукция', 'Молоко', 90);
+INSERT INTO goods VALUES (2, 'молочная_продукция', 'Кефир', 70);
+INSERT INTO goods VALUES (3, 'молочная_продукция', 'Ряженка', 75);
+INSERT INTO goods VALUES (4, 'бакалея', 'Оливковое масло', 250);
+INSERT INTO goods VALUES (5, 'бакалея', 'Макароны', 50);
+INSERT INTO goods VALUES (6, 'бакалея', 'Овсяные хлопья', 30);
+INSERT INTO goods VALUES (7, 'кондитерские_изделия', 'Шоколад', 90);
+INSERT INTO goods VALUES (8, 'кондитерские_изделия', 'Конфеты', 270);
+INSERT INTO goods VALUES (9, 'кондитерские_изделия', 'Мармелад', 180);
+INSERT INTO goods VALUES (10, 'замороженная_продукция', 'Блины', 210);
+INSERT INTO goods VALUES (11, 'замороженная_продукция', 'Котлеты', 300);
+INSERT INTO goods VALUES (12, 'замороженная_продукция', 'Пельмени', 290);
+INSERT INTO goods VALUES (13, 'напитки', 'Газированная вода', 40);
+INSERT INTO goods VALUES (13, 'напитки', 'Негазированная вода', 25);
+INSERT INTO goods VALUES (13, 'напитки', 'Сок', 80);
+
+--4
+CREATE TABLE staff (
+    id         NUMBER(3),
+    name       VARCHAR2(50),
+    department VARCHAR2(40), 
+    salary     NUMBER(6),
+    birth_day  DATE,
+    experience NUMBER(2)
+)
+
+INSERT INTO staff VALUES (1, 'Нагаев', 'Управление', 50000, '15.01.1981', 15);
+INSERT INTO staff VALUES (2, 'Петров', 'Сбыт', 35000, '18.10.1976', 20);
+INSERT INTO staff VALUES (3, 'Галиев', 'Плановый', 25000, '23.04.1972', 22);
+INSERT INTO staff VALUES (4, 'Панов', 'Производство', 32000, '28.12.1973', 19);
+INSERT INTO staff VALUES (5, 'Тернов', 'Производство', 20000, '01.08.1968', 39);
+INSERT INTO staff VALUES (6, 'Тамилова', 'Сбыт', 18000, '25.06.1991', 10);
+INSERT INTO staff VALUES (7, 'Кас', 'Производство', 25000, '11.05.1978', 34);
+INSERT INTO staff VALUES (8, 'Карнас', 'Производство', 20000, '19.07.1989', 8);
+INSERT INTO staff VALUES (9, 'Алексеев', 'Производство', 21000, '21.02.1971', 24);
+INSERT INTO staff VALUES (10, 'Романов', 'Сбыт', 19000, '27.09.1969', 45);
+INSERT INTO staff VALUES (11, 'Иванов', 'Плановый', 31000, '12.10.1987', 24);
+INSERT INTO staff VALUES (12, 'Сидоров', 'РСУ', 30000, '17.04.1981', 14);
+
+CREATE TABLE staff_exp
+AS SELECT st.id, st.name, st.experience,
+    CASE WHEN (mod((experience+1),5)) = 0 THEN 10000 END AS premium  
+FROM staff st;
+
+CREATE TABLE staff_sal (
+    id         NUMBER(3),
+    name       VARCHAR2(50),
+    department VARCHAR2(40), 
+    salary     NUMBER(6)
+); 
+
+INSERT INTO staff_sal
+SELECT st.id, LOWER(st.name) AS name, st.department, st.salary+2000 AS salary
+FROM staff AS st
+WHEN department = 'Сбыт';
