@@ -1,0 +1,119 @@
+/*8 ВВЕДЕНИЕ В ОСНОВЫ ЯЗЫКА PL SQL*/
+DECLARE 
+    salary_staff VARCHAR2(50);
+BEGIN
+    SELECT name||' '||salary
+        INTO salary_staff
+    FROM staff
+    WHERE department = 'Управление';
+    dbms_output.put_line('Заработная плата в отделе Управления состаляет:'||' '||salary_staff);
+END;
+/
+
+
+/*9 ПРОЦЕДУРЫ, ФУНКЦИИ, ПАКЕТЫ*/
+--1 Процедура для получения данных по идентификатору
+CREATE OR REPLACE PROCEDURE find_id (
+    people_id IN NUMBER)
+IS
+    people_name   VARCHAR2(30);
+    people_salary NUMBER(5);
+    people_dep    VARCHAR2(30);
+BEGIN
+    SELECT name, salary, department
+    INTO people_name, people_salary, people_dep
+    FROM staff
+    WHERE staff.id = people_id;
+END find_id;
+
+SET SERVEROUTPUT ON;
+
+EXECUTE find_id(1);
+
+--2Функция для вычичления формулы (x+y)^2-z
+CREATE OR REPLACE FUNCTION math_form (
+    x IN NUMBER,
+    y IN NUMBER,
+    z IN NUMBER) RETURN NUMBER
+IS
+BEGIN
+    RETURN ((x+y)**2-z);
+END;
+
+--3 Функция, которая производит подсчет значений по записи на основании ее ключевых данных
+CREATE OR REPLACE FUNCTION count_elements RETURN NUMBER
+IS
+elements NUMBER := 0;
+BEGIN 
+    SELECT count(*) INTO elements FROM staff;
+    RETURN elements;
+END;
+
+BEGIN
+    dbms_output.put_line(count_elements);
+END;
+
+--4 Создание пакета
+CREATE OR REPLACE PACKAGE my_pacckage IS
+    PROCEDURE find_id (
+    people_id IN NUMBER);
+    FUNCTION math_form (
+    x IN NUMBER,
+    y IN NUMBER,
+    z IN NUMBER)RETURN NUMBER;
+    FUNCTION count_elements RETURN NUMBER;
+--5 Перегруженные процедуры 
+    FUNCTION joinder (
+        str1 IN VARCHAR2,
+        str2 IN VARCHAR2) RETURN VARCHAR2;
+    FUNCTION joinder (
+        num1 IN NUMBER,
+        num2 IN NUMBER) RETURN NUMBER;
+END;
+
+CREATE OR REPLACE PACKAGE BODY my_pacckage IS
+    PROCEDURE find_id (people_id IN NUMBER) IS
+        people_name   VARCHAR2(30);
+        people_salary NUMBER(5);
+        people_dep    VARCHAR2(30);
+    BEGIN
+        SELECT name, salary, department
+        INTO people_name, people_salary, people_dep
+        FROM staff
+        WHERE staff.id = people_id;
+    END find_id;
+    
+    FUNCTION math_form (
+        x IN NUMBER,
+        y IN NUMBER,
+        z IN NUMBER) RETURN NUMBER
+    IS
+    BEGIN
+        RETURN ((x+y)**2-z);
+    END;
+    
+    FUNCTION count_elements RETURN NUMBER IS
+        elements NUMBER := 0;
+    BEGIN 
+        SELECT count(*) INTO elements FROM staff;
+        RETURN elements;
+    END;
+   
+--Перегруженные процедуры
+    FUNCTION joinder (
+        str1 IN VARCHAR2,
+        str2 IN VARCHAR2) RETURN VARCHAR2
+    IS
+    BEGIN
+        RETURN str1||' '||str2;
+    END;
+
+    FUNCTION joinder (
+        num1 IN NUMBER,
+        num2 IN NUMBER) RETURN NUMBER
+    IS
+    BEGIN
+        RETURN num1+num2;
+    END;
+
+END;
