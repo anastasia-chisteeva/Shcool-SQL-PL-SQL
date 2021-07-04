@@ -1,0 +1,53 @@
+--1 
+CREATE VIEW staff_production(id, name, salary) AS
+SELECT id, name, salary
+FROM staff
+WHERE department = 'Производство';
+
+CREATE VIEW students_gr1 (student_id, surname, name, gr_id, name_advicer, department) AS
+SELECT st.student_id, st.surname, st.name, st.gr_id, adv.name, adv.department
+FROM students st
+    JOIN scientific_advisers adv
+    ON st.advicer_id = adv.advicer_id
+WHERE st.gr_id = 1;
+    
+--2
+CREATE TABLE staff_audit (
+    id NUMBER(4),
+    o_name       VARCHAR2(30),
+    n_name       VARCHAR2(30),
+    o_department VARCHAR2(30),
+    n_department VARCHAR2 (30),
+    o_salary     NUMBER (6), 
+    n_salary     NUMBER (6),
+    o_experience NUMBER(2),
+    n_experience NUMBER(2),    
+    time timestamp(6)
+);
+
+CREATE OR REPLACE  TRIGGER tr_staff_ins
+AFTER INSERT 
+    ON staff
+FOR EACH ROW
+BEGIN 
+    INSERT INTO staff_audit (id, n_name, n_department, n_salary, n_experience, time) 
+                VALUES (:new.id, :new.name, :new.department, :new.salary, :new.experience, systimestamp);
+END;
+                                
+CREATE OR REPLACE TRIGGER tr_staff_upd
+AFTER UPDATE
+    ON staff
+FOR EACH ROW
+BEGIN 
+    INSERT INTO staff_audit (id, o_name, n_name, o_department, n_department, o_salary, n_salary, o_experience, n_experience, time) 
+                VALUES (:new.id, :old.name, :new.name, :old.department, :new.department, :old.salary, :new.salary, :old.experience, :new.experience, systimestamp);
+END;                
+
+CREATE OR REPLACE TRIGGER tr_staff_del
+AFTER DELETE
+    ON staff
+FOR EACH ROW
+BEGIN
+    INSERT INTO staff_audit (id, o_name, o_department, o_salary, o_experience, time) 
+                 VALUES (:new.id, :old.name, :old.department, :old.salary, :old.experience, systimestamp);
+END;
